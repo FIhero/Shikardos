@@ -10,7 +10,7 @@ def get_mask_card_number(card_number: str) -> str:
 
 
 def get_mask_account(account: str) -> str:
-    """маскирует счет, оставляя видимыми последние 4 цифры"""
+    """Маскирует счет, оставляя видимыми последние 4 цифры"""
     last_four = account[-4:]
     mask_length = len(account) - 4
     mask = "*" * mask_length
