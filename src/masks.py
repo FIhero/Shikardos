@@ -1,21 +1,19 @@
 def get_mask_card_number(card_number: str) -> str:
-    """Маскирует номер банковской карты, заменяя часть цифр на '*'."""
-    if not card_number or not card_number.isdigit():
+    if not card_number or not card_number.replace(" ", "").isdigit():
         return card_number
-    elif len(card_number) < 10:
+    cleaned = card_number.replace(" ", "")
+    if len(cleaned) < 10:  # Минимальная длина для маскировки
         return card_number
-    first_part = card_number[:6]
-    last_part = card_number[-4:]
-    masked_part = "*" * (len(card_number) - 10)
-    return f"{first_part}{masked_part}{last_part}"
+    return f"{cleaned[:6]}{'*' * (len(cleaned) - 10)}{cleaned[-4:]}"
 
 
 def get_mask_account(account: str) -> str:
-    """Маскирует счет, оставляя видимыми последние 4 цифры"""
-    if not account or not account.isdigit():
+    """Маскирует номер счёта, оставляя последние 4 цифры и сохраняя исходную длину"""
+    if not account:
+        return ""
+    cleaned = account.replace(" ", "")
+    if not cleaned.isdigit():
         return account
-    last_four = account[-4:]
-    mask_length = len(account) - 4
-    mask = "*" * mask_length
-    masked_account = mask + last_four
-    return masked_account
+    if len(cleaned) < 4:
+        return account
+    return "*" * (len(cleaned) - 4) + cleaned[-4:]
