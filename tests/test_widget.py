@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, NoReturn, Optional
 
 import pytest
 
@@ -16,9 +16,11 @@ from src.widget import get_date, mask_account_card
         ("JustTextWithoutNumber", "JustTextWithoutNumber"),
         ("", ""),
         ("CardTooShort 123", "CardTooShort 123"),
+        (None, None),
+        (123, None),
     ],
 )
-def test_mask_account_card_valid(input_str: str, expected: str) -> None:
+def test_mask_account_card_valid(input_str: Any, expected: Optional[str]) -> None:
     assert mask_account_card(input_str) == expected
 
 
@@ -33,20 +35,30 @@ def test_mask_account_card_valid(input_str: str, expected: str) -> None:
         ("2023-04-31T00:00:00", None),
         ("", None),
         ("2023-12-31", None),
+        (None, None),
     ],
 )
-def test_get_date_valid(iso_date: str, expected: Optional[str]) -> None:
+def test_get_date_valid(iso_date: Optional[str], expected: Optional[str]) -> None:
     assert get_date(iso_date) == expected
 
 
-def test_error_handling(monkeypatch: Any) -> None:
-    def mock_fail(_: str) -> str:
-        raise ValueError("Test error")
+def test_mask_account_card_edge_cases() -> None:
+    """Тестирует крайние случаи маскировки"""
+    assert mask_account_card("счет 123") == "счет 123"
+    assert mask_account_card("Visa 123456") == "Visa 123456"
+    assert mask_account_card("Card 123!@#") == "Card 123!@#"
 
+
+def test_get_date_edge_cases() -> None:
+    """Тестирует крайние случаи даты"""
+    assert get_date("2023-01-32T00:00:00") is None
+    assert get_date("invalid-date") is None
+
+
+def mock_fail(_: str) -> NoReturn:
+    raise ValueError("Test error")
+
+
+def test_error_handling(monkeypatch: Any) -> None:
     monkeypatch.setattr("src.widget.mask_account_card", mock_fail)
     assert mask_account_card("Счет 123") == "Счет 123"
-    assert mask_account_card("Invalid !@# Data") == "Invalid !@# Data"
-
-
-def test_get_date_empty_string() -> None:
-    assert get_date("") is None

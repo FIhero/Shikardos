@@ -39,7 +39,7 @@ def mask_account_card(type_and_number: Optional[str]) -> Optional[str]:
 
 
 def get_date(date_str: Optional[str]) -> Optional[str]:
-    """Преобразует дату из ISO 8601 в ДД.ММ.ГГГГ с валидацией"""
+    """Преобразует дату в ДД.ММ.ГГГГ с валидацией"""
     if date_str is None:
         return None
 
@@ -51,7 +51,6 @@ def get_date(date_str: Optional[str]) -> Optional[str]:
         year, month, day = date_part.split("-")
         year_num, month_num, day_num = int(year), int(month), int(day)
 
-        # Валидация даты
         if not (1 <= month_num <= 12):
             return None
 
