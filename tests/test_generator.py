@@ -24,12 +24,26 @@ def empty_transactions() -> List[Dict[str, Any]]:
     return []
 
 
-# Тесты для filter_by_currency
-def test_filter_by_currency_normal(sample_transactions: List[Dict[str, Any]]) -> None:
-    """Тестирует фильтрацию по валюте в обычном случае"""
-    result: List[Dict[str, Any]] = list(filter_by_currency(sample_transactions, "USD"))
-    assert len(result) == 2
-    assert all(t["currency"] == "USD" for t in result)
+# Параметризованные тесты для filter_by_currency
+@pytest.mark.parametrize(
+    "currency, expected_count, expected_descriptions",
+    [
+        ("USD", 2, ["Payment 1", "Payment 3"]),
+        ("EUR", 1, ["Payment 2"]),
+        ("GBP", 0, []),
+    ],
+)
+def test_filter_by_currency_normal(
+    sample_transactions: List[Dict[str, Any]],
+    currency: str,
+    expected_count: int,
+    expected_descriptions: List[str],
+) -> None:
+    """Тестирует фильтрацию по валюте с параметризацией"""
+    result: List[Dict[str, Any]] = list(filter_by_currency(sample_transactions, currency))
+    assert len(result) == expected_count
+    assert [t["description"] for t in result] == expected_descriptions
+    assert all(t["currency"] == currency for t in result)
 
 
 def test_filter_by_currency_empty(empty_transactions: List[Dict[str, Any]]) -> None:
@@ -45,45 +59,60 @@ def test_filter_by_currency_missing_key(sample_transactions: List[Dict[str, Any]
     assert len(result) == 2
 
 
-# Тесты для transaction_descriptions
-def test_transaction_descriptions_normal(sample_transactions: List[Dict[str, Any]]) -> None:
-    """Тестирует получение описаний транзакций"""
-    result: List[Optional[str]] = list(transaction_descriptions(sample_transactions))
-    assert result == ["Payment 1", "Payment 2", "Payment 3"]
+# Параметризованные тесты для transaction_descriptions
+@pytest.mark.parametrize(
+    "transactions, expected_descriptions",
+    [
+        (
+            [
+                {"amount": 100, "description": "Payment 1"},
+                {"amount": 200, "description": "Payment 2"},
+            ],
+            ["Payment 1", "Payment 2"],
+        ),
+        (
+            [
+                {"amount": 100, "description": "A"},
+                {"amount": 200},
+                {"amount": 300, "description": "B"},
+            ],
+            ["A", None, "B"],
+        ),
+        ([], []),
+    ],
+)
+def test_transaction_descriptions_parametrized(
+    transactions: List[Dict[str, Any]], expected_descriptions: List[Optional[str]]
+) -> None:
+    """Параметризованный тест для получения описаний транзакций"""
+    result: List[Optional[str]] = list(transaction_descriptions(transactions))
+    assert result == expected_descriptions
 
 
-def test_transaction_descriptions_empty(empty_transactions: List[Dict[str, Any]]) -> None:
-    """Тестирует пустой список транзакций"""
-    result: List[Any] = list(transaction_descriptions(empty_transactions))
-    assert len(result) == 0
-
-
-def test_transaction_descriptions_missing_desc(sample_transactions: List[Dict[str, Any]]) -> None:
-    """Тестирует отсутствие описания"""
-    modified_transactions: List[Dict[str, Any]] = sample_transactions + [
-        {"amount": 400, "currency": "GBP"}
-    ]  # type: ignore
-    result: List[Optional[str]] = list(transaction_descriptions(modified_transactions))
-    assert result[-1] is None
-
-
-# Тесты для card_number_generator
-def test_card_number_generator_normal() -> None:
-    """Тестирует генерацию номеров карт"""
-    result: List[str] = list(card_number_generator(1, 5))
-    assert result == [
-        "0000 0000 0000 0001",
-        "0000 0000 0000 0002",
-        "0000 0000 0000 0003",
-        "0000 0000 0000 0004",
-        "0000 0000 0000 0005",
-    ]
-
-
-def test_card_number_generator_format() -> None:
-    """Тестирует форматирование номера карты"""
-    result: str = next(card_number_generator(1234567890123456, 1234567890123456))
-    assert result == "1234 5678 9012 3456"
+# Параметризованные тесты для card_number_generator
+@pytest.mark.parametrize(
+    "start, end, expected",
+    [
+        (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002", "0000 0000 0000 0003"]),
+        (
+            9998,
+            10001,
+            [
+                "0000 0000 0000 9998",
+                "0000 0000 0000 9999",
+                "0000 0000 0001 0000",
+                "0000 0000 0001 0001",
+            ],
+        ),
+        (1234567890123456, 1234567890123456, ["1234 5678 9012 3456"]),
+    ],
+)
+def test_card_number_generator_parametrized(
+    start: int, end: int, expected: List[str]
+) -> None:
+    """Параметризованный тест генерации номеров карт"""
+    result: List[str] = list(card_number_generator(start, end))
+    assert result == expected
 
 
 def test_card_number_generator_edge_cases() -> None:
