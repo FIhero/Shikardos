@@ -1,13 +1,11 @@
 import os
-from tempfile import NamedTemporaryFile
-from typing import Any
-
 import pytest
+from tempfile import NamedTemporaryFile
 from _pytest.capture import CaptureFixture
-
 from src.decorators import log
 
 
+# Вспомогательные функции с аннотациями типов
 def successful_func(a: int, b: int) -> int:
     return a + b
 
@@ -17,7 +15,7 @@ def failing_func(a: int, b: int) -> int:
 
 
 class TestLogDecorator:
-    def test_console_logging(self, capsys: CaptureFixture[str]) -> None:
+    def test_console_logging(self, capsys: CaptureFixture) -> None:
         @log()
         def decorated_func(a: int, b: int) -> int:
             return a + b
@@ -33,7 +31,7 @@ class TestLogDecorator:
         assert "END" in output
         assert result == 5
 
-    def test_console_error_logging(self, capsys: CaptureFixture[str]) -> None:
+    def test_console_error_logging(self, capsys: CaptureFixture) -> None:
         @log()
         def decorated_func(a: int, b: int) -> int:
             raise ValueError("Test error")
@@ -53,14 +51,13 @@ class TestLogDecorator:
             tmp_path = tmp_file.name
 
         try:
-
             @log(filename=tmp_path)
             def decorated_func(a: int, b: int) -> int:
                 return a + b
 
             decorated_func(2, 3)
 
-            with open(tmp_path, "r") as f:
+            with open(tmp_path, 'r') as f:
                 content = f.read()
 
             assert "decorated_func - START" in content
@@ -70,15 +67,12 @@ class TestLogDecorator:
         finally:
             os.unlink(tmp_path)
 
-    @pytest.mark.parametrize(
-        "a,b,expected",
-        [
-            (1, 2, 3),
-            (0, 0, 0),
-            (-1, 1, 0),
-        ],
-    )
-    def test_parametrized(self, a: int, b: int, expected: int, capsys: CaptureFixture[str]) -> None:
+    @pytest.mark.parametrize("a,b,expected", [
+        (1, 2, 3),
+        (0, 0, 0),
+        (-1, 1, 0),
+    ])
+    def test_parametrized(self, a: int, b: int, expected: int, capsys: CaptureFixture) -> None:
         @log()
         def decorated_func(a: int, b: int) -> int:
             return a + b
