@@ -107,9 +107,7 @@ def test_transaction_descriptions_parametrized(
         (1234567890123456, 1234567890123456, ["1234 5678 9012 3456"]),
     ],
 )
-def test_card_number_generator_parametrized(
-    start: int, end: int, expected: List[str]
-) -> None:
+def test_card_number_generator_parametrized(start: int, end: int, expected: List[str]) -> None:
     """Параметризованный тест генерации номеров карт"""
     result: List[str] = list(card_number_generator(start, end))
     assert result == expected
