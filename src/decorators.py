@@ -24,7 +24,7 @@ def log(filename: Optional[str] = None) -> Callable[[T], T]:
                 print(start_msg, end="")
 
             try:
-                result = func(*args, **kwargs)  # Здесь была ошибка
+                result = func(*args, **kwargs)
 
                 success_msg = f"{timestamp} - {func_name} - Result: {result!r}\nEND\n"
                 if filename:
