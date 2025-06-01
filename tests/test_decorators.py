@@ -1,7 +1,9 @@
 import os
-import pytest
 from tempfile import NamedTemporaryFile
+
+import pytest
 from _pytest.capture import CaptureFixture
+
 from src.decorators import log
 
 
@@ -51,13 +53,14 @@ class TestLogDecorator:
             tmp_path = tmp_file.name
 
         try:
+
             @log(filename=tmp_path)
             def decorated_func(a: int, b: int) -> int:
                 return a + b
 
             decorated_func(2, 3)
 
-            with open(tmp_path, 'r') as f:
+            with open(tmp_path, "r") as f:
                 content = f.read()
 
             assert "decorated_func - START" in content
@@ -67,11 +70,14 @@ class TestLogDecorator:
         finally:
             os.unlink(tmp_path)
 
-    @pytest.mark.parametrize("a,b,expected", [
-        (1, 2, 3),
-        (0, 0, 0),
-        (-1, 1, 0),
-    ])
+    @pytest.mark.parametrize(
+        "a,b,expected",
+        [
+            (1, 2, 3),
+            (0, 0, 0),
+            (-1, 1, 0),
+        ],
+    )
     def test_parametrized(self, a: int, b: int, expected: int, capsys: CaptureFixture) -> None:
         @log()
         def decorated_func(a: int, b: int) -> int:

@@ -7,6 +7,7 @@ T = TypeVar("T", bound=Callable[..., Any])
 
 def log(filename: Optional[str] = None) -> Callable[[T], T]:
     """Автоматически логирует начало и конец выполнения функции, а также ее результаты или возникшие ошибки"""
+
     def decorator(func: T) -> T:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
