@@ -1,4 +1,3 @@
-# Все импорты должны быть в начале файла
 from src.logger_config import setup_logging
 from src.masks import mask_credit_card
 from src.utils import format_phone_number
