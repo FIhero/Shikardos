@@ -1,15 +1,8 @@
 [run]
+source = src
 omit =
     */site-packages/*
     */venv/*
     */env/*
-    # Если у вас есть другие служебные файлы/папки, которые не являются частью вашего кода
-    # например:
-    # my_script.py
-    # data/*
 
 [report]
-# Если вы хотите более строго исключить файлы из отчета, можно использовать exclude_lines
-# exclude_lines =
-#    if TYPE_CHECKING:
-#    ...
